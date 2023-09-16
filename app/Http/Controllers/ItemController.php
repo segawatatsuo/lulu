@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
+use Illuminate\Support\Facades\Auth;
 
 class ItemController extends Controller
 {
@@ -30,7 +32,8 @@ class ItemController extends Controller
     public function index()
     {
         //モデルメソッド
-        $items = $this->item->allItems();
+        //$items = $this->item->allItems();
+        $items = Item::where('user_id',auth()->id())->get();
         return view('item/index', compact('items'));
     }
 
@@ -100,12 +103,12 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {
+ 
         $item = Item::find($id);
         $item->sku = $request->input('sku');
         $item->product_name = $request->input('product_name');
         $item->price = $request->input('price');
         $item->stock = $request->input('stock');
-
 
         $validate_rule = [
             'sku' => 'required',
@@ -114,8 +117,6 @@ class ItemController extends Controller
             'price' => 'required|numeric'
         ];
         $this->validate($request, $validate_rule);
-
-
 
         $item->save();
         return redirect()->route('item.index')->with(['message' => '更新しました']);

@@ -46,12 +46,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    //リレーション
     public function items()
     {
-        return $this->hasMany('App\Models\Item');
+        return $this->hasMany(Item::class);
     }
-    public function orders()
-    {
-        return $this->hasMany('App\Models\Order');
-    }
+
 }

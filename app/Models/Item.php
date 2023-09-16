@@ -28,7 +28,7 @@ class Item extends Model
     //リレーション
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     //ログインユーザーのIDをuser_idに保存

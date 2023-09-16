@@ -41,8 +41,12 @@ Route::get('shipping',[OrderController::class,'shipping'])->name('shipping.index
 Route::get('item',[ItemController::class,'index'])->name('item.index');
 Route::get('item.create',[ItemController::class,'create'])->name('item.create');
 Route::post('item.store',[ItemController::class,'store'])->name('item.store');
+
 Route::post('item.show/{id}',[ItemController::class,'show'])->name('item.show');    // 表示
+Route::get('item.show/{id}',[ItemController::class,'show'])->name('item.show');    // バリデートの戻り表示用
+
 Route::post('item.update/{id}/',[ItemController::class,'update'])->name('item.update');  // 完了
+
 
 Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.destroy');  // 削除
 

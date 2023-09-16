@@ -17,7 +17,7 @@
 
         <form action="{{ route('item.update', $item->id) }}" method="POST">
             @csrf
-
+            {{-- @method('PATCH') --}}
             <fieldset>
                 <div class="form-group">
 
@@ -54,7 +54,7 @@
                     <label for="book_name">{{ __('価格') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
                     <input type="text" class="form-control" name="price" id="price" placeholder="半角数字"
-                        value="{{ number_format($item->price) }}">
+                        value="{{ $item->price }}">
 
 
 
