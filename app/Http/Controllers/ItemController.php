@@ -31,8 +31,14 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //$items = Item::where('user_id',auth()->id())->get();
+        /*
         $items = Item::withSum('arrivals', 'arrival')->get();
+        $items = Item::where('user_id',auth()->id())->get();
+        */
+        
+        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->get();
+        //$items = Item::where('user_id',auth()->id())->get();
+        
         return view('item/index', compact('items'));
     }
 
@@ -59,7 +65,6 @@ class ItemController extends Controller
         $validate_rule = [
             'sku' => 'required',
             'product_name' => 'required',
-            'stock' => 'required|numeric',
             'price' => 'required|numeric'
         ];
         $this->validate($request, $validate_rule);
@@ -114,7 +119,6 @@ class ItemController extends Controller
         $validate_rule = [
             'sku' => 'required',
             'product_name' => 'required',
-            'stock' => 'required|numeric',
             'price' => 'required|numeric'
         ];
         $this->validate($request, $validate_rule);

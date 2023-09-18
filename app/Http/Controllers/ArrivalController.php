@@ -30,7 +30,13 @@ class ArrivalController extends Controller
 */
     public function index()
     {
+        /*
         $items = Item::withSum('arrivals', 'arrival')->get();
+        $items = Item::where('user_id',auth()->id())->get();
+        */
+        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->get();
+        //$items = Item::where('user_id',auth()->id())->get();
+
         return view("arrival.index",compact('items'));
     }
 

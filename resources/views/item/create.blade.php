@@ -42,6 +42,7 @@
                     <input type="text" class="form-control" name="product_name" id="product_name"
                         value="{{ old('product_name') }}">
 
+                        <!--
                     <label for="book_name">{{ __('入庫数') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
                     <input type="text" class="form-control" name="stock" id="stock" placeholder="半角数字"
@@ -49,6 +50,8 @@
 
                     <label for="book_name">{{ __('在庫数') }}</label>
                     <input type="text" class="form-control" name="quantity" id="quantity" placeholder="入力不要" disabled>
+                    -->
+
 
                     <label for="book_name">{{ __('価格') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
