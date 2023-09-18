@@ -65,7 +65,6 @@ class ItemController extends Controller
         $validate_rule = [
             'sku' => 'required',
             'product_name' => 'required',
-            'price' => 'required|numeric'
         ];
         $this->validate($request, $validate_rule);
 
@@ -113,13 +112,12 @@ class ItemController extends Controller
         $item = Item::find($id);
         $item->sku = $request->input('sku');
         $item->product_name = $request->input('product_name');
-        $item->price = $request->input('price');
-        $item->stock = $request->input('stock');
+        //$item->price = $request->input('price');
+        //$item->stock = $request->input('stock');
 
         $validate_rule = [
             'sku' => 'required',
             'product_name' => 'required',
-            'price' => 'required|numeric'
         ];
         $this->validate($request, $validate_rule);
 
