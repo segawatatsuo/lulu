@@ -6,8 +6,9 @@ use App\Http\Requests\StoreSearchOrderRequest;
 use App\Http\Requests\UpdateSearchOrderRequest;
 use App\Models\SearchOrder;
 use App\Models\SearchOrderTemp;
-
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -20,13 +21,18 @@ class SearchOrderController extends Controller
      */
     public function index(Request $request)
     {
-
         //SearchOrderTempテーブルの全レコードを削除して空にする。
         SearchOrderTemp::truncate();
 
         // ------------------------------------------------ 基礎情報
-        define("RMS_SERVICE_SECRET", "SP256060_QzXjO8cLgxtFSuGy");
-        define("RMS_LICENSE_KEY", "SL256060_51mJW265mqrL5EQ6");
+        $user = User::find(Auth::id());
+        //$rms_service_secret = $user->rms_service_secret;
+        //$rms_license_key = $user->rms_license_key;
+        //define("RMS_SERVICE_SECRET", "SP256060_QzXjO8cLgxtFSuGy");
+        //define("RMS_LICENSE_KEY", "SL256060_51mJW265mqrL5EQ6");
+
+        define("RMS_SERVICE_SECRET", $user->rms_service_secret);
+        define("RMS_LICENSE_KEY", $user->rms_license_key);
         define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
 
         $authkey = AUTH_KEY;
@@ -38,8 +44,11 @@ class SearchOrderController extends Controller
         // ------------------------------------------------ パラメーター情報 連想配列
         $param = array(
             'dateType' => 1, //1: 注文日
-            'startDatetime' => '2023-09-05T00:00:00+0900', //期間検索開始日時
-            'endDatetime' => '2023-09-12T00:00:00+0900', //期間検索終了日時
+            //'startDatetime' => '2023-09-05T00:00:00+0900', //期間検索開始日時
+            //'endDatetime' => '2023-09-12T00:00:00+0900', //期間検索終了日時
+            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+
 
             'PaginationRequestModel:' => array( //ページングリクエストモデル
                 'requestRecordsAmount : 100', //1ページあたりの取得結果数.最大 1000 件まで指定可能
@@ -65,26 +74,37 @@ class SearchOrderController extends Controller
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        //dd($jsonstr);
-        $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト（配列ではない）
 
-        //dd($orderNumberList);
+        $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型（配列ではない）
+
 
         //Tempテーブルにインポート
+        $user_id = Auth::id();
         foreach ($orderNumberList as $str) {
-            $orderNumber=mb_convert_encoding($str,"utf-8");
-            $search_order_temp = SearchOrderTemp::create(['order_number' => $orderNumber]);
+            $orderNumber = mb_convert_encoding($str, "utf-8");
+            //$search_order_temp = SearchOrderTemp::create(['order_number' => $orderNumber]);
+            $SearchOrderTemp = new SearchOrderTemp();
+            $SearchOrderTemp->fill(['order_number' => $orderNumber]);
+            $SearchOrderTemp->fill(['user_id' => $user_id]);
+            $SearchOrderTemp->save();
         }
 
         //SearchOrderTempにあって、searchorderに存在しないもの（=新規レコード）
-        $not_exist_data = SearchOrderTemp::doesntHave('searchorder')->get();
-        //dd($newdatas->dd());
+        $query = SearchOrderTemp::doesntHave('search_order')->get();
+        //該当userだけに絞り込む
+        $not_exist_data=$query->where('user_id',Auth::id()); 
 
-        $hoge = json_decode($not_exist_data, true);
+        $search_orders = json_decode($not_exist_data, true);
 
-
-
-        //return view('search-order.index', compact('search_order'));S
+        foreach ($search_orders as $item) {
+            print_r($item['order_number']);
+            print("<br>");
+            //$search_order = SearchOrder::create(['order_number' => $item['order_number']]);
+            $SearchOrder = new SearchOrder();
+            $SearchOrder->fill(['order_number' => $item['order_number']]);
+            $SearchOrder->fill(['user_id' => Auth::id()]);
+            $SearchOrder->save();
+        }
     }
 
     public function test()
@@ -93,8 +113,9 @@ class SearchOrderController extends Controller
         //dd($all);
         $hoge = SearchOrderTemp::first();
         //select * from `search_order_temps` where not exists (select * from `search_orders` where `search_order_temps`.`order_number` = `search_orders`.`order_number`)
-        $not_exist_data = SearchOrderTemp::doesntHave('searchorder')->select('order_number')->get();
-        print_r($not_exist_data[0]);
+        //$not_exist_data = SearchOrderTemp::doesntHave('search_order')->select('order_number')->get();
+        $not_exist_data = SearchOrderTemp::doesntHave('search_order')->get();
+        print_r($not_exist_data[0]['order_number']);
     }
 
     /**

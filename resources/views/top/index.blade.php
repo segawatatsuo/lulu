@@ -9,6 +9,7 @@
 
 @section('content')
     {{-- コンテンツ --}}
+    
 
     <blockquote class="quote-info mt-0">
         <h5 id="tip">お知らせ</h5>
@@ -29,7 +30,7 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td>出荷準備中</td>
+                            <td>出荷待ち</td>
                             <td></td>
                         </tr>
                         <tr>
@@ -79,7 +80,7 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td>現在の在庫数量</td>
+                            <td>保管在庫数</td>
                             <td></td>
                         </tr>
                         <tr>

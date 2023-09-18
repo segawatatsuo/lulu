@@ -7,7 +7,7 @@
 <div class="container small">
 
     @section('content_header')
-        <h1>商品編集</h1>
+        <h1>入荷数登録</h1>
     @stop
 
     @section('content')
@@ -15,7 +15,7 @@
 
 
 
-        <form action="{{ route('item.update', $item->id) }}" method="POST">
+        <form action="{{ route('arrival.store', $item->id) }}" method="POST">
             @csrf
             {{-- @method('PATCH') --}}
             <fieldset>
@@ -34,33 +34,24 @@
                     @endif
 
 
-                    <label for="book_name">{{ __('SKU') }}<span
-                            class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
-                    <input type="text" class="form-control" name="sku" id="sku" value="{{ $item->sku }}">
+                    <label for="book_name">{{ __('SKU') }}</label>
+                    <input type="text" class="form-control" name="sku" id="sku" value="{{ $item->sku }}" disabled>
 
-                    <label for="book_name">{{ __('商品名') }}<span
-                            class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
+                    <label for="book_name">{{ __('商品名') }}</label>
                     <input type="text" class="form-control" name="product_name" id="product_name"
-                        value="{{ $item->product_name }}">
+                        value="{{ $item->product_name }}" disabled>
 
                     <label for="book_name">{{ __('入庫数') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
-                    <input type="text" class="form-control" name="stock" id="stock" placeholder="半角数字"
-                        value="{{ $item->stock }}">
+                    <input type="text" class="form-control" name="arrival" id="arrival" placeholder="半角数字"
+                        value="{{ old('arrival') }}">
 
-                    <label for="book_name">{{ __('保管在庫数') }}</label>
-                    <input type="text" class="form-control" name="quantity" id="quantity" placeholder="入力不要" disabled>
-
-                    <label for="book_name">{{ __('価格') }}<span
-                            class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
-                    <input type="text" class="form-control" name="price" id="price" placeholder="半角数字"
-                        value="{{ $item->price }}">
 
 
 
 
                     <div class="d-flex justify-content-between pt-3">
-                        <a href="{{ route('item.index') }}" class="btn btn-outline-secondary" role="button">
+                        <a href="{{ route('arrival.index') }}" class="btn btn-outline-secondary" role="button">
                             <i class="fa fa-reply mr-1" aria-hidden="true"></i>{{ __('一覧画面へ') }}
                         </a>
                         <button type="submit" class="btn btn-success">
@@ -70,7 +61,35 @@
 
 
             </fieldset>
+            <input type="hidden" id="postId" name="postId" value="{{ $item->id }}" />
         </form>
+
+
+
+
+        <div>
+
+            <table class="table table-striped" style="width: 20%">
+    
+                <thead>
+                    <tr>
+                        <th style="width: 15%">登録日</th>
+                        <th style="width: 5%" class="text-right">入庫数</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    @foreach ($arrivals as $item)
+                        <tr>
+                            <td>{{ $item->created_at }}</td>
+                            <td class="text-right">{{ number_format($item->arrival) }}</td>
+    
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+    
+        </div>
 
 
 

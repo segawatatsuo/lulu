@@ -31,11 +31,12 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //モデルメソッド
-        //$items = $this->item->allItems();
-        $items = Item::where('user_id',auth()->id())->get();
+        //$items = Item::where('user_id',auth()->id())->get();
+        $items = Item::withSum('arrivals', 'arrival')->get();
         return view('item/index', compact('items'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.

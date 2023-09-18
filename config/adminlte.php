@@ -390,6 +390,12 @@ return [
             'icon_color' => 'cyan',
             'url'        => 'item',
         ],
+        [
+            'text'       => '入荷',
+            'icon_color' => 'white',
+            'url'        => 'arrival',
+        ],
+
     ],
 
     /*

@@ -7,17 +7,14 @@
 <div class="container small">
 
     @section('content_header')
-        <h1>商品編集</h1>
+        <h1>入荷登録</h1>
     @stop
 
     @section('content')
         {{-- コンテンツ --}}
 
-
-
-        <form action="{{ route('item.update', $item->id) }}" method="POST">
+        <form action="{{ route('arrival.store') }}" method="POST">
             @csrf
-            {{-- @method('PATCH') --}}
             <fieldset>
                 <div class="form-group">
 
@@ -36,28 +33,27 @@
 
                     <label for="book_name">{{ __('SKU') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
-                    <input type="text" class="form-control" name="sku" id="sku" value="{{ $item->sku }}">
+                    <input type="text" class="form-control" name="sku" id="sku" value="{{ old('sku') }}">
+
+
 
                     <label for="book_name">{{ __('商品名') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
                     <input type="text" class="form-control" name="product_name" id="product_name"
-                        value="{{ $item->product_name }}">
+                        value="{{ old('product_name') }}">
 
                     <label for="book_name">{{ __('入庫数') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
                     <input type="text" class="form-control" name="stock" id="stock" placeholder="半角数字"
-                        value="{{ $item->stock }}">
+                        value="{{ old('stock') }}">
 
-                    <label for="book_name">{{ __('保管在庫数') }}</label>
+                    <label for="book_name">{{ __('在庫数') }}</label>
                     <input type="text" class="form-control" name="quantity" id="quantity" placeholder="入力不要" disabled>
 
                     <label for="book_name">{{ __('価格') }}<span
                             class="badge badge-danger ml-2">{{ __('必須') }}</span></label>
                     <input type="text" class="form-control" name="price" id="price" placeholder="半角数字"
-                        value="{{ $item->price }}">
-
-
-
+                        value="{{ old('price') }}">
 
                     <div class="d-flex justify-content-between pt-3">
                         <a href="{{ route('item.index') }}" class="btn btn-outline-secondary" role="button">

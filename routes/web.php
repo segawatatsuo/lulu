@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\SearchOrderController;
+use App\Http\Controllers\ArrivalController;
 use Database\Seeders\SearchOrderSeeder;
 
 /*
@@ -37,6 +38,16 @@ Route::get('order',[OrderController::class,'index'])->name('order.index');
 #出荷状況
 Route::get('shipping',[OrderController::class,'shipping'])->name('shipping.index');
 
+#入荷
+Route::get('arrival',[ArrivalController::class,'index'])->name('arrival.index');
+Route::get('arrival.create',[ArrivalController::class,'create'])->name('arrival.create');
+Route::get('arrival.show/{id}',[ArrivalController::class,'show'])->name('arrival.show');    // バリデーションの戻り表示
+Route::post('arrival.show/{id}',[ArrivalController::class,'show'])->name('arrival.show');    // 表示
+Route::post('arrival.store',[ArrivalController::class,'store'])->name('arrival.store');
+Route::get('arrival.store',[ArrivalController::class,'store'])->name('arrival.store');
+Route::post('arrival.destroy/{id}/',[ArrivalController::class,'destroy'])->name('arrival.destroy');  // 削除
+
+
 #商品情報
 Route::get('item',[ItemController::class,'index'])->name('item.index');
 Route::get('item.create',[ItemController::class,'create'])->name('item.create');
@@ -46,12 +57,8 @@ Route::post('item.show/{id}',[ItemController::class,'show'])->name('item.show');
 Route::get('item.show/{id}',[ItemController::class,'show'])->name('item.show');    // バリデートの戻り表示用
 
 Route::post('item.update/{id}/',[ItemController::class,'update'])->name('item.update');  // 完了
-
-
 Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.destroy');  // 削除
-
 
 #SearchOrder
 Route::get('search-order',[SearchOrderController::class,'index'])->name('search-order.index');
-
 Route::get('test',[SearchOrderController::class,'test']);

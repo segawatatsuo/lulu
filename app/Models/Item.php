@@ -31,12 +31,18 @@ class Item extends Model
         return $this->belongsTo(User::class);
     }
 
+    //リレーション
+    public function arrivals()
+    {
+        return $this->hasMany(Arrival::class);
+    }
+
     //ログインユーザーのIDをuser_idに保存
     protected static function boot()
     {
         parent::boot();
         // 保存時user_idをログインユーザーに設定
-        self::saving(function($item) {
+        self::saving(function ($item) {
             $item->user_id = \Auth::id();
         });
     }
@@ -59,9 +65,4 @@ class Item extends Model
             'price' => $request->price,
         ]);
     }
-
-
-
-
-
 }
