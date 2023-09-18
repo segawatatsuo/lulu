@@ -56,7 +56,7 @@
         </table>
 
     </div>
-
+    {{ $items->links() }}
 
 @stop
 

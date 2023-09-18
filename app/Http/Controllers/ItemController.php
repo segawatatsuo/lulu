@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Pagination\Paginator;
+
 class ItemController extends Controller
 {
 
@@ -35,9 +37,8 @@ class ItemController extends Controller
         $items = Item::withSum('arrivals', 'arrival')->get();
         $items = Item::where('user_id',auth()->id())->get();
         */
-        
-        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->get();
-        //$items = Item::where('user_id',auth()->id())->get();
+        //get()を->paginate(10)に変更
+        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->paginate(10);
         
         return view('item/index', compact('items'));
     }

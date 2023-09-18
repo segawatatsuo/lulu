@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Arrival;
 use App\Models\Item;
 
+use Illuminate\Pagination\Paginator;
+
 class ArrivalController extends Controller
 {
     public function __construct()
@@ -34,7 +36,7 @@ class ArrivalController extends Controller
         $items = Item::withSum('arrivals', 'arrival')->get();
         $items = Item::where('user_id',auth()->id())->get();
         */
-        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->get();
+        $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->paginate(10);
         //$items = Item::where('user_id',auth()->id())->get();
 
         return view("arrival.index",compact('items'));

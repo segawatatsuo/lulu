@@ -61,7 +61,8 @@
 
     </div>
 
-
+    {{ $items->links() }}
+    
 @stop
 
 @section('css')
