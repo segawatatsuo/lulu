@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\OrderDetail;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -25,7 +27,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return view('order/index');
+        $orders = Order::orderBy('created_at')->paginate(10);
+        return view('order/index',compact('orders'));
     }
 
     public function shipping()
@@ -60,10 +63,16 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+
+    public function show( $id )
     {
-        //
+        //主キーではないのでfind($id)ではnullを返してくる。
+        $orders = Order::where('id', $id)->first();
+        $no = $orders->orderNumber;
+        $details = OrderDetail::with('order')->where('orderNumber',$no)->get();
+        return view('order.show',compact('orders','details'));
     }
+
 
     /**
      * Show the form for editing the specified resource.

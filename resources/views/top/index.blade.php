@@ -9,7 +9,7 @@
 
 @section('content')
     {{-- コンテンツ --}}
-    
+
 
     <blockquote class="quote-info mt-0">
         <h5 id="tip">お知らせ</h5>
@@ -26,16 +26,16 @@
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <td>新規受付</td>
-                            <td></td>
+                            <td style="width: 50%">新規受付</td>
+                            <td>{{ $count_new }}</td>
                         </tr>
                         <tr>
                             <td>出荷待ち</td>
-                            <td></td>
+                            <td>{{ $count_orderProgress }}</td>
                         </tr>
                         <tr>
                             <td>出荷済み</td>
-                            <td></td>
+                            <td>{{ $count_complete }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,16 +51,16 @@
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <td>受注金額</td>
-                            <td></td>
+                            <td style="width: 50%">受注金額</td>
+                            <td>{{ number_format($sum_requestPrice) }}</td>
                         </tr>
                         <tr>
                             <td>受注件数</td>
-                            <td></td>
+                            <td>{{ $count_order }}</td>
                         </tr>
                         <tr>
                             <td>出荷件数</td>
-                            <td></td>
+                            <td>{{ $count_complete }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -76,16 +76,16 @@
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <td>登録商品数</td>
-                            <td></td>
+                            <td style="width: 50%">登録商品数</td>
+                            <td>{{ $items_count }}</td>
                         </tr>
                         <tr>
                             <td>保管在庫数</td>
-                            <td></td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>現在の不良在庫数量</td>
-                            <td></td>
+                            <td>0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -101,18 +101,27 @@
             <div class="card-body">
                 <table class="table table-bordered">
                     <tbody>
-                        <tr>
-                            <td>商品名１</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>商品名２</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>商品名３</td>
-                            <td></td>
-                        </tr>
+                        @if ($top3 != null and count($top3) != 0)
+                            <tr>
+                                <td>1.{{ mb_strimwidth($top3[0]->itemName, 0, 40, '...') }}</td>
+                            </tr>
+                            <tr>
+                                <td>2.{{ mb_strimwidth($top3[1]->itemName, 0, 40, '...') }}</td>
+                            </tr>
+                            <tr>
+                                <td>3.{{ mb_strimwidth($top3[2]->itemName, 0, 40, '...') }}</td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
 
@@ -127,8 +136,8 @@
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <td>楽天</td>
-                            <td></td>
+                            <td style="width: 50%">楽天</td>
+                            <td>{{ number_format($sum_requestPrice) }}</td>
                         </tr>
                         <tr>
                             <td>Yahoo</td>

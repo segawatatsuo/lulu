@@ -8,42 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-        'ec_mall',
-        'order_id',
-        'order_date',
-        'sku',
-        'product_code',
-        'product_name',
-        'quantity',
-        'purchaser_name',
-        'total',
-        'tax',
-        'shipping_fee',
-        'commission',
-        'other_expenses',
-        'use_point',
-        'payment_total',
-        'name01',
-        'postal_code',
-        'addr01',
-        'delivery_method',
-        'payment_method',
-        'tracking_number',
-        'note',
-        'processing_status',
-        'cancel_flag',
-        'pause_flag',
-        'sort_no',
-
+    // モデルに関連付けるテーブル
+    protected $table = 'orders';
+    //整数値ではない主キーなのでインクリメントさせない
+    public $incrementing = false;
+    //主キーは文字型
+    protected $keyType = 'string';
+    //主キーはorderNumber
+    protected $primaryKey = 'orderNumber';
+    protected $guarded = [
+        'id',
     ];
 
-
-    public function user()
+    //リレーション
+    public function orderdetail()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(OrderDetail::class,'orderNumber');
     }
 
 }

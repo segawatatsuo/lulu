@@ -35,6 +35,8 @@ Route::get('adminlte', function () {
 
 #受注状況
 Route::get('order',[OrderController::class,'index'])->name('order.index');
+Route::get('order.show/{id}',[OrderController::class,'show'])->name('order.show');
+
 #出荷状況
 Route::get('shipping',[OrderController::class,'shipping'])->name('shipping.index');
 
@@ -62,3 +64,5 @@ Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.
 #SearchOrder
 Route::get('search-order',[SearchOrderController::class,'index'])->name('search-order.index');
 Route::get('test',[SearchOrderController::class,'test']);
+
+Route::get('getorder',[SearchOrderController::class,'getorder']);

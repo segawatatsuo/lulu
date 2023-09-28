@@ -18,8 +18,6 @@ class SearchOrderTemp extends Model
     //主キーはorder_number
     protected $primaryKey = 'order_number';
 
-    //protected $primaryKey = 'user_id';
-
     protected $fillable = [
         'order_number',
         'user_id',
@@ -28,6 +26,11 @@ class SearchOrderTemp extends Model
     public function search_order()
     {
         return $this->hasMany(SearchOrder::class,'order_number');
+    }
+    
+    public function order()
+    {
+        return $this->hasMany(Order::class,'orderNumber');
     }
 
 }
