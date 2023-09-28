@@ -46,10 +46,10 @@ class SearchOrderController extends Controller
         // ------------------------------------------------ パラメーター情報 連想配列
         $param = array(
             'dateType' => 1, //1: 注文日
-            'startDatetime' => '2023-09-27T00:00:00+0900', //期間検索開始日時
-            'endDatetime' => '2023-09-27T23:59:59+0900', //期間検索終了日時
-            //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
-            //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+            //'startDatetime' => '2023-09-28T00:00:00+0900', //期間検索開始日時
+            //'endDatetime' => '2023-09-28T23:59:59+0900', //期間検索終了日時
+            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
 
             'PaginationRequestModel:' => array( //ページングリクエストモデル
                 'requestRecordsAmount : 1000', //1ページあたりの取得結果数.最大 1000 件まで指定可能
