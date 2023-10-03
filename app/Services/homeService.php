@@ -89,10 +89,10 @@ class homeService
         $param = array(
             'orderProgressList' => [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ],
             'dateType' => 1, //1: 注文日
-            //'startDatetime' => '2023-10-03T00:00:00+0900',
-            //'endDatetime' => '2023-10-03T23:59:59+0900',
-            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
-            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+            'startDatetime' => '2023-09-25T00:00:00+0900',
+            'endDatetime' => '2023-10-04T23:59:59+0900',
+            //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
             'PaginationRequestModel' => [
                 'requestRecordsAmount' => 1000,
                 'requestPage' => 1,
@@ -113,7 +113,7 @@ class homeService
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        dd($jsonstr);
+        //dd($jsonstr);
         $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型
         //Tempテーブルにインポート
         $user_id = Auth::id();
