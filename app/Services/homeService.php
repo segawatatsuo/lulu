@@ -90,7 +90,7 @@ class homeService
             'orderProgressList' => [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ],
             'dateType' => 1, //1: 注文日
             'startDatetime' => '2023-09-25T00:00:00+0900',
-            'endDatetime' => '2023-10-04T23:59:59+0900',
+            'endDatetime' => '2023-09-28T23:59:59+0900',
             //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
             //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
             'PaginationRequestModel' => [
@@ -151,7 +151,7 @@ class homeService
             'orderNumberList' => $array,
             'version' => 7,
         );
-
+        //dd($array);
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
 
         $ch = curl_init($url);
@@ -164,7 +164,7 @@ class homeService
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
         $Orders = $jsonstr->OrderModelList;
-        
+        //dd($jsonstr);
 
         //注文者情報
         foreach ($Orders as $order) {
