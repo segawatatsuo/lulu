@@ -113,6 +113,7 @@ class homeService
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
+        dd($jsonstr);
         $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型
         //Tempテーブルにインポート
         $user_id = Auth::id();
