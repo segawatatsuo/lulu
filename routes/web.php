@@ -8,6 +8,7 @@ use App\Http\Controllers\SearchOrderController;
 use App\Http\Controllers\ArrivalController;
 use Database\Seeders\SearchOrderSeeder;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,6 +33,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('adminlte', function () {
     return view('adminlte');
 });
+
 
 #受注状況
 Route::get('order',[OrderController::class,'index'])->name('order.index');
@@ -63,6 +65,7 @@ Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.
 
 #SearchOrder
 Route::get('search-order',[SearchOrderController::class,'index'])->name('search-order.index');
-Route::get('test',[SearchOrderController::class,'test']);
-
 Route::get('getorder',[SearchOrderController::class,'getorder']);
+
+#テスト
+Route::get('hoge', [SearchOrderController::class,'hoge']);

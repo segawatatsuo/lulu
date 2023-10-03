@@ -27,13 +27,14 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::orderBy('orderDate','desc')->paginate(10);
+        $orders = Order::where('user_id',Auth::id())->orderBy('id','desc')->paginate(10);
         return view('order/index',compact('orders'));
     }
 
     public function shipping()
     {
-        return view('shipping/index');
+        $orders=Order::where('user_id',Auth::id())->where('dateOfShipment','>=','2000/01/01')->orderBy('orderDate','desc')->paginate(10);
+        return view('shipping/index',compact('orders'));
     }
 
     /**

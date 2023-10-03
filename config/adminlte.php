@@ -395,6 +395,11 @@ return [
             'icon_color' => 'white',
             'url'        => 'arrival',
         ],
+        [
+            'text'       => 'API',
+            'icon_color' => 'white',
+            'url'        => 'arrival',
+        ],
 
     ],
 

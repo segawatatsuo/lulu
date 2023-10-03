@@ -4,12 +4,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Defaults
+    | Authentication Defaults　認証の初期設定
     |--------------------------------------------------------------------------
     |
     | This option controls the default authentication "guard" and password
     | reset options for your application. You may change these defaults
     | as required, but they're a perfect start for most applications.
+    | このオプションは、デフォルトの認証「ガード」とパスワードを制御します。
+    | アプリケーションのオプションをリセットします。これらのデフォルトは変更できます
+    | 必要に応じて必要ですが、ほとんどのアプリケーションにとって完璧なスタート地点です。
     |
     */
 
@@ -20,7 +23,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Guards
+    | Authentication Guards　ログイン機構の種類
     |--------------------------------------------------------------------------
     |
     | Next, you may define every authentication guard for your application.
@@ -37,9 +40,16 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+            'driver' => 'session', //認証方法。多くの場合はセッション認証 (session) です。
+            'provider' => 'users', //認証状態の管理方法。誰 （モデル） をどんなロジック （プロバイダドライバ） で、ログインさせるか。
         ],
+
+        //マルチログイン用に管理者を追加
+        'admin' => [
+            'driver' => 'session', 
+            'provider' => 'admins', 
+        ],
+
     ],
 
     /*
@@ -64,6 +74,13 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
+
+        //マルチログイン用に管理者を追加 Adminモデルを使う（上はUserモデルを使っている）
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+
 
         // 'users' => [
         //     'driver' => 'database',

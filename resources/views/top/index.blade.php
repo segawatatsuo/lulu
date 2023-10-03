@@ -13,7 +13,7 @@
 
     <blockquote class="quote-info mt-0">
         <h5 id="tip">お知らせ</h5>
-        <p>2023-9-15 準備中</p>
+        <p>2023/09/25〜</p>
     </blockquote>
 
 
@@ -101,7 +101,7 @@
             <div class="card-body">
                 <table class="table table-bordered">
                     <tbody>
-                        @if ($top3 != null and count($top3) != 0)
+                        @if ($top3 != null and count($top3) >= 3)
                             <tr>
                                 <td>1.{{ mb_strimwidth($top3[0]->itemName, 0, 40, '...') }}</td>
                             </tr>

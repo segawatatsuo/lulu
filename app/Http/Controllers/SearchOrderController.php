@@ -28,11 +28,6 @@ class SearchOrderController extends Controller
 
         // ------------------------------------------------ 基礎情報
         $user = User::find(Auth::id());
-        //$rms_service_secret = $user->rms_service_secret;
-        //$rms_license_key = $user->rms_license_key;
-        //define("RMS_SERVICE_SECRET", "SP256060_QzXjO8cLgxtFSuGy");
-        //define("RMS_LICENSE_KEY", "SL256060_51mJW265mqrL5EQ6");
-
         define("RMS_SERVICE_SECRET", $user->rms_service_secret);
         define("RMS_LICENSE_KEY", $user->rms_license_key);
         define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
@@ -45,24 +40,20 @@ class SearchOrderController extends Controller
 
         // ------------------------------------------------ パラメーター情報 連想配列
         $param = array(
+            'orderProgressList' => [100, 200, 300, 400, 500, 600, 700, 800, 900],
             'dateType' => 1, //1: 注文日
-            //'startDatetime' => '2023-09-28T00:00:00+0900', //期間検索開始日時
-            //'endDatetime' => '2023-09-28T23:59:59+0900', //期間検索終了日時
-            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
-            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+            'startDatetime' => '2023-09-27T00:00:00+0900',
+            'endDatetime' => '2023-10-03T23:59:59+0900',
+            //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
 
-            'PaginationRequestModel:' => array( //ページングリクエストモデル
-                'requestRecordsAmount : 1000', //1ページあたりの取得結果数.最大 1000 件まで指定可能
-                'requestPage : 5', //リクエストページ番号
-                'SortModelList:' => array(
-                    "sortColumn : 1", //並び替え項目.1: 注文日時
-                    "sortDirection : 1" //並び替え方法.1: 昇順（小さい順、古い順）
-                )
-            ),
+            'PaginationRequestModel' => [
+                'requestRecordsAmount' => 1000,
+                'requestPage' => 1,
+                'SortModel' => ['sortColumn' => 1, 'sortDirection' => 2]
+            ]
         );
-        //searchOrder
-        //この機能を利用すると、楽天ペイ注文の「注文検索」を行うことができます。こちらは同期処理となります。
-        //検索結果が 15000 件以上の場合、15001 件目以降の受注番号は取得できません。
+        $data = json_encode($param);
 
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/searchOrder/";
 
@@ -72,11 +63,12 @@ class SearchOrderController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); //jsonにエンコード
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-
-        $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型（配列ではない）
+        //dd($jsonstr);
+        $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型
         //dd($orderNumberList);
         //Tempテーブルにインポート
         $user_id = Auth::id();
@@ -125,9 +117,10 @@ class SearchOrderController extends Controller
         //Orderテーブルに存在しないSearchOrderTempの値だけを取り出す
         $order_numbers = SearchOrderTemp::doesntHave('order')->get();
         $array = [];
-        foreach($order_numbers as $num){
-            array_push( $array ,$num->order_number );
+        foreach ($order_numbers as $num) {
+            array_push($array, $num->order_number);
         }
+        $array = ['256060-20231001-0623910393'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
@@ -145,22 +138,11 @@ class SearchOrderController extends Controller
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
         $Orders = $jsonstr->OrderModelList;
-        //dd($Orders[0]->PackageModelList[0]->ItemModelList[0]->SkuModelList[0]->skuInfo);
-        /*
-        $orderNumber=$Orders[0]->orderNumber;
-        $orderProgress=$Orders[0]->orderProgress;
-        $zipCode1=$Orders[0]->OrdererModel->zipCode1;
-        $SettlementModel=$Orders[0]->SettlementModel->settlementMethod;
-        $ItemModelList=$Orders[0]->PackageModelList[0]->ItemModelList[0]->itemName;//商品内容（配列）
-        */
-
-
-        
+        //dd($Orders[0]->PackageModelList[0]->ShippingModelList[0]->deliveryCompanyName);
 
         //注文者情報
         foreach ($Orders as $order) {
-
-
+            dd(count($order->PackageModelList[0]->ShippingModelList));
             $add_order = new Order();
             $user_id = Auth::id();
             $add_order->fill([
@@ -171,7 +153,7 @@ class SearchOrderController extends Controller
                 'orderDatetime' => $order->orderDatetime,
                 'shopOrderCfmDatetime' => $order->shopOrderCfmDatetime,
                 'orderFixDatetime' => $order->orderFixDatetime,
-                'orderDate' => substr($order->orderDatetime,0,10),
+                'orderDate' => substr($order->orderDatetime, 0, 10),
                 'shippingInstDatetime' => $order->shippingInstDatetime,
                 'shippingCmplRptDatetime' => $order->shippingCmplRptDatetime,
                 'cancelDueDate' => $order->cancelDueDate,
@@ -213,7 +195,7 @@ class SearchOrderController extends Controller
                 'mailPlugSentence' => $order->mailPlugSentence,
                 'modifyFlag' => $order->modifyFlag,
                 'receiptIssueCount' => $order->receiptIssueCount,
-                'receiptIssueHistoryList' => implode( $order->receiptIssueHistoryList ),
+                'receiptIssueHistoryList' => implode($order->receiptIssueHistoryList),
                 'Order_zipCode1' => $order->OrdererModel->zipCode1,
                 'Order_zipCode2' => $order->OrdererModel->zipCode2,
                 'Order_prefecture' => $order->OrdererModel->prefecture,
@@ -277,6 +259,8 @@ class SearchOrderController extends Controller
                 'couponPrice' => $order->TaxSummaryModelList[0]->couponPrice,
                 'point' => $order->TaxSummaryModelList[0]->point,
                 'shoppingMallName' => '楽天'
+
+
             ]);
             $add_order->save();
         }
@@ -326,20 +310,57 @@ class SearchOrderController extends Controller
 
     public function test(Request $request)
     {
-        //$all = SearchOrderTemp::all();
-        //dd($all);
+        $user = User::find(Auth::id());
+        define("RMS_SERVICE_SECRET", $user->rms_service_secret);
+        define("RMS_LICENSE_KEY", $user->rms_license_key);
+        define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
 
-        //$not_exist_data = SearchOrderTemp::doesntHave('order')->get();
-        //dd($not_exist_data);
-        //print_r($not_exist_data[0]['order_number']);
+        $authkey = AUTH_KEY;
+        $header = array(
+            "Content-Type: application/json; charset=utf-8",
+            "Authorization: ESA {$authkey}",
+        );
+        // データベースから、現在300以外を取り出す
+        $order_numbers = Order::where('orderProgress', '!=', 300)->get();
+        //dd($order_numbers);
+        $array = [];
+        foreach ($order_numbers as $num) {
+            array_push($array, $num->orderNumber);
+        }
+        $param = array(
+            'orderNumberList' => $array,
+            'version' => 7,
+        );
+        //dd($param);
 
-            // データベースから、今日作成されたデータをを取り出す
-            $today=Carbon::today();
-            $dangos=Order::whereDate('orderDatetime', $today)->get();
-            dd($dangos);
+        $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true); //POST送信
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); //jsonにエンコード
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $xml = curl_exec($ch);
+        curl_close($ch);
 
+        $jsonstr = json_decode($xml, false);
+        //dd($jsonstr);
+        $Orders = $jsonstr->OrderModelList;
+
+        foreach ($Orders as $order) {
+            $orderNumber = $order->orderNumber;
+            $orderProgress = $order->orderProgress;
+            //Order::where('orderNumber',$orderNumber)->update(['orderProgress'=> $orderProgress,]);
+            print($orderNumber."-".$orderProgress."<br>");
+        }
     }
 
+
+    public function hoge()
+    {
+        $hoge = Order::where('shippingDocumentNumber',NULL)->get();
+        dd($hoge);
+    }
     /**
      * Show the form for creating a new resource.
      *
