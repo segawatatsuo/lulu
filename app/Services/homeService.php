@@ -89,10 +89,10 @@ class homeService
         $param = array(
             'orderProgressList' => [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ],
             'dateType' => 1, //1: 注文日
-            'startDatetime' => '2023-09-29T00:00:00+0900',
-            'endDatetime' => '2023-10-04T23:59:59+0900',
-            //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
-            //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+            //'startDatetime' => '2023-09-29T00:00:00+0900',
+            //'endDatetime' => '2023-10-04T23:59:59+0900',
+            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
             'PaginationRequestModel' => [
                 'requestRecordsAmount' => 1000,
                 'requestPage' => 1,
@@ -403,15 +403,17 @@ class homeService
         $jsonstr = json_decode($xml, false);
         //dd($jsonstr);
         $Orders = $jsonstr->OrderModelList;
+        //dd($jsonstr);
 
         foreach ($Orders as $order) {
             $orderNumber = $order->orderNumber;
             $orderProgress = $order->orderProgress;
-            $shippingDetailId = $order->shippingDetailId;
+
+            //$shippingDetailId = $order->shippingDetailId;
             //$shippingNumber = $order->shippingDocumentNumber;
-            $deliveryCompany = $order->deliveryCompany;
-            $deliveryCompanyName = $order->deliveryCompanyName;
-            $shippingDate = $order->dateOfShipment;
+            //$deliveryCompany = $order->deliveryCompany;
+            //$deliveryCompanyName = $order->deliveryCompanyName;
+            //$shippingDate = $order->dateOfShipment;
 
             $Sender_zipCode1 = $order->Sender_zipCode1;
             $Sender_zipCode2 = $order->Sender_zipCode2;
@@ -428,10 +430,10 @@ class homeService
 
             Order::where('orderNumber',$orderNumber)->update([
                 'orderProgress' => $orderProgress,
-                'shippingDetailId' => $shippingDetailId,
-                'deliveryCompany' => $deliveryCompany,
-                'deliveryCompanyName' => $deliveryCompanyName,
-                'shippingDate' => $shippingDate,
+                //'shippingDetailId' => $shippingDetailId,
+                //'deliveryCompany' => $deliveryCompany,
+                //'deliveryCompanyName' => $deliveryCompanyName,
+                //'shippingDate' => $shippingDate,
 
                 'Sender_zipCode1' => $Sender_zipCode1,
                 'Sender_zipCode2' => $Sender_zipCode2,

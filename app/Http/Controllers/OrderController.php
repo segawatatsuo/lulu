@@ -27,7 +27,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::where('user_id',Auth::id())->orderBy('id','desc')->paginate(10);
+        $orders = Order::where('user_id',Auth::id())->orderBy('orderDatetime','desc')->paginate(10);
         return view('order/index',compact('orders'));
     }
 
