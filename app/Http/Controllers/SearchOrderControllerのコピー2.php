@@ -120,7 +120,7 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        $array = ['419133-20230927-0182909819','419133-20230927-0222309700','419133-20230927-0233609691','419133-20230927-0267809551','419133-20230926-0892309387','419133-20230926-0894709296','419133-20230926-0902409271','419133-20230926-0930109294','419133-20230926-0928209321','419133-20230926-0942009299','419133-20230926-0929909532','419133-20230926-0005909575','419133-20230926-0055009617','419133-20230926-0062509576','419133-20230926-0087309556','419133-20230926-0075509687','419133-20230926-0087709584','419133-20230926-0117909563','419133-20230926-0128409542','419133-20230926-0097809822','419133-20230926-0118709807','419133-20230926-0140909741','419133-20230926-0156509643','419133-20230926-0183609554'];
+        $array = ['256060-20231001-0623910393'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
@@ -137,11 +137,8 @@ class SearchOrderController extends Controller
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        //dd($jsonstr);
-
-
         $Orders = $jsonstr->OrderModelList;
-        dd($Orders[23]->PackageModelList[0]->ShippingModelList);
+        //dd($Orders[0]->PackageModelList[0]->ShippingModelList[0]->deliveryCompanyName);
 
         //注文者情報
         foreach ($Orders as $order) {
@@ -324,7 +321,7 @@ class SearchOrderController extends Controller
             "Authorization: ESA {$authkey}",
         );
         // データベースから、現在300以外を取り出す
-        $order_numbers = Order::where('orderProgress', '!=', 300)->where('user_id',Auth::id())->get();
+        $order_numbers = Order::where('orderProgress', '!=', 300)->get();
         //dd($order_numbers);
         $array = [];
         foreach ($order_numbers as $num) {
@@ -344,12 +341,10 @@ class SearchOrderController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); //jsonにエンコード
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $xml = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);//HTTP Statusコード
         curl_close($ch);
-        
 
         $jsonstr = json_decode($xml, false);
-        dd($httpcode);
+        //dd($jsonstr);
         $Orders = $jsonstr->OrderModelList;
 
         foreach ($Orders as $order) {
@@ -357,64 +352,6 @@ class SearchOrderController extends Controller
             $orderProgress = $order->orderProgress;
             //Order::where('orderNumber',$orderNumber)->update(['orderProgress'=> $orderProgress,]);
             print($orderNumber."-".$orderProgress."<br>");
-        }
-    }
-
-
-    public function api_upload(Request $request)
-    {
-        // ------------------------------------------------ 基礎情報
-        $user = User::find(Auth::id());
-        define("RMS_SERVICE_SECRET", $user->rms_service_secret);
-        define("RMS_LICENSE_KEY", $user->rms_license_key);
-        define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
-
-        $authkey = AUTH_KEY;
-        $header = array(
-            "Content-Type: application/json; charset=utf-8",
-            "Authorization: ESA {$authkey}",
-        );
-
-        // ------------------------------------------------ パラメーター情報 連想配列
-        $param = array(
-            'orderNumber' => '419133-20230926-0930109294', //注文番号
-            'BasketidModelList' => [
-                'basketId' => '1921287223',
-                'ShippingModelList' =>[
-                    'shippingDetailId' => null,
-                    'deliveryCompany' => '1003',
-                    'shippingNumber' => '628095009006',
-                    'shippingDate' => '2023-10-02',
-                ]
-            ]
-        );
-        $data = json_encode($param);
-        $url = "https://api.rms.rakuten.co.jp/es/2.0/order/updateOrderShipping/";
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_POST, true); //POST送信
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); //jsonにエンコード
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $xml = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);//HTTP Statusコード
-        curl_close($ch);
-
-        if($httpcode==200){
-            echo "OK<br>";
-        }elseif($httpcode==401){
-            echo "Un-Authorised (APIの使用許可がありません)<br>";
-        }elseif($httpcode==400){
-            echo "Bad Request (リクエストが不正です)<br>";
-        }elseif($httpcode==404){
-            echo "Not Found (Request-URI に一致するものを見つけられません)<br>";
-        }elseif($httpcode==405){
-            echo "Method Not Allowed (許可されていないメソッドです)<br>";
-        }elseif($httpcode==500){
-            echo "Internal Server Error (サーバ内部にエラーが発生)<br>";
-        }elseif($httpcode==503){
-            echo "Service Unavailable (サービスが一時的に過負荷やメンテナンスで使用不可能)<br>";
         }
     }
 
@@ -474,12 +411,10 @@ class SearchOrderController extends Controller
      * @param  \App\Models\SearchOrder  $searchOrder
      * @return \Illuminate\Http\Response
      */
-    /*
     public function update(UpdateSearchOrderRequest $request, SearchOrder $searchOrder)
     {
         //
     }
-    */
 
     /**
      * Remove the specified resource from storage.

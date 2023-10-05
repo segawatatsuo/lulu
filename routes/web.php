@@ -67,5 +67,12 @@ Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.
 Route::get('search-order',[SearchOrderController::class,'index'])->name('search-order.index');
 Route::get('getorder',[SearchOrderController::class,'getorder']);
 
+#楽天にアップロード
+Route::get('upload',[OrderController::class,'upload'])->name('upload.index');
+Route::post('store',[OrderController::class,'store'])->name('upload.store');
+
+
+Route::get('api_upload',[SearchOrderController::class,'api_upload']);
+
 #テスト
-Route::get('hoge', [SearchOrderController::class,'hoge']);
+Route::get('test', [SearchOrderController::class,'test']);

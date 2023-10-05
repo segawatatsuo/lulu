@@ -395,7 +395,11 @@ return [
             'icon_color' => 'white',
             'url'        => 'arrival',
         ],
-
+        [
+            'text'       => 'UPLOAD',
+            'icon_color' => 'blue',
+            'url'        => 'upload',
+        ],
 
     ],
 
