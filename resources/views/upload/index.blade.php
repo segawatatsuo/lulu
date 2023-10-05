@@ -47,7 +47,7 @@
       </form>
     </div>
 
-    {{-- $orders->links() --}}
+    {{ $orders->links() }}
 @stop
 
 @section('css')
