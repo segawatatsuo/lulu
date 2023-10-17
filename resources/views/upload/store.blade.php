@@ -5,7 +5,7 @@
 
 @section('content_header')
     <h1>楽天出荷報告</h1>
-    
+    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('upload.index') }}'">戻る</button>
 @stop
 
 @section('content')

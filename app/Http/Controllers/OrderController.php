@@ -112,7 +112,16 @@ class OrderController extends Controller
             $shippingDate = $order->dateOfShipment;
             array_push($ship_list, [$orderNumber, $basketId, $deliveryCompany, $shippingNumber, $shippingDate]);
         }
-        //dd($ship_list[0][0]);
+        //dd($ship_list[0]);
+        /*
+array:5 [▼
+  0 => "419133-20230926-0183609554"
+  1 => 1922064049
+  2 => "1003"
+  3 => "628089764772"
+  4 => "2023-09-28"
+]
+*/
 
         // ------------------------------------------------ 基礎情報
         $user = User::find(Auth::id());
@@ -126,9 +135,9 @@ class OrderController extends Controller
             "Authorization: ESA {$authkey}",
         );
 
-        $results=[];
-        
-        foreach ( $ship_list as $data ) {
+        $results = [];
+
+        foreach ($ship_list as $data) {
             $orderNumber = $data[0];
             $basketId = $data[1];
             $deliveryCompany = $data[2];
@@ -137,51 +146,75 @@ class OrderController extends Controller
             // ------------------------------------------------ パラメーター情報 連想配列
             $param = array(
                 'orderNumber' => $orderNumber, //注文番号
-                'BasketidModelList' => [
-                    'basketId' => $basketId,
-                    'ShippingModelList' => [
-                        'shippingDetailId' => null,
-                        'deliveryCompany' => $deliveryCompany,
-                        'shippingNumber' => $shippingNumber,
-                        'shippingDate' => $shippingDate,
+                'BasketidModelList' => 
+                [
+                    [
+                        'basketId' => $basketId,
+                        'ShippingModelList' => 
+                        array([
+                            //'shippingDetailId' => null,
+                            'deliveryCompany' => $deliveryCompany,
+                            'shippingNumber' => $shippingNumber,
+                            'shippingDate' => $shippingDate,
+                        ])
                     ]
                 ]
             );
+            //dd($param);
             $data = json_encode($param);
+            //$data = $param;
+            //dd($data);
+            /*"{
+"orderNumber":"419133-20230926-0183609554",
+"BasketidModelList":{
+	"basketId":1922064049,
+	"ShippingModelList":{
+		"shippingDetailId":null,
+		"deliveryCompany":"1003",
+		"shippingNumber":"628089764772",
+		"shippingDate":"2023-09-28"
+		}
+	}
+} "
+*/
+
+
             $url = "https://api.rms.rakuten.co.jp/es/2.0/order/updateOrderShipping/";
 
             $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_POST, true); 
+            curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); 
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $xml = curl_exec($ch);
-            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            
+
             if ($httpcode == 200) {
-                array_push($results,$orderNumber."...ok");
+                array_push($results, $orderNumber . "...ok");
                 //DB更新
                 $order = Order::where('orderNumber', $orderNumber)->first();
                 $order->cmpletionReportUpLoadDate = new Carbon();
                 $order->save();
+                
             } elseif ($httpcode == 401) {
-                array_push($results,$orderNumber."...Un-Authorised (APIの使用許可がありません)");
+                array_push($results, $orderNumber . "...Un-Authorised (APIの使用許可がありません)");
             } elseif ($httpcode == 400) {
-                array_push($results,$orderNumber."...Bad Request (リクエストが不正です)");
+                array_push($results, $orderNumber . "...Bad Request (リクエストが不正です)");
             } elseif ($httpcode == 404) {
-                array_push($results,$orderNumber."...Not Found (Request-URI に一致するものを見つけられません)");
+                array_push($results, $orderNumber . "...Not Found (Request-URI に一致するものを見つけられません)");
             } elseif ($httpcode == 405) {
-                array_push($results,$orderNumber."...Method Not Allowed (許可されていないメソッドです)");
+                array_push($results, $orderNumber . "...Method Not Allowed (許可されていないメソッドです)");
             } elseif ($httpcode == 500) {
-                array_push($results,$orderNumber."...Internal Server Error (サーバ内部にエラーが発生)");
+                array_push($results, $orderNumber . "...Internal Server Error (サーバ内部にエラーが発生)");
             } elseif ($httpcode == 503) {
-                array_push($results,$orderNumber."...Service Unavailable (サービスが一時的に過負荷やメンテナンスで使用不可能)");
+                array_push($results, $orderNumber . "...Service Unavailable (サービスが一時的に過負荷やメンテナンスで使用不可能)");
             }
         }
-        return view('upload.store',compact('results'));
+        return view('upload.store', compact('results'));
+        //return redirect('todofuken/tokyo');
     }
     /**
      * Show the form for editing the specified resource.

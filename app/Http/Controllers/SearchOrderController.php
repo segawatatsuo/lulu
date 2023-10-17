@@ -42,8 +42,8 @@ class SearchOrderController extends Controller
         $param = array(
             'orderProgressList' => [100, 200, 300, 400, 500, 600, 700, 800, 900],
             'dateType' => 1, //1: 注文日
-            'startDatetime' => '2023-09-27T00:00:00+0900',
-            'endDatetime' => '2023-10-03T23:59:59+0900',
+            'startDatetime' => '2023-10-01T00:00:00+0900',
+            'endDatetime' => '2023-10-17T23:59:59+0900',
             //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
             //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
 
@@ -54,6 +54,7 @@ class SearchOrderController extends Controller
             ]
         );
         $data = json_encode($param);
+
 
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/searchOrder/";
 
@@ -120,7 +121,7 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        $array = ['419133-20230926-0863709486','419133-20230930-0464310103','419133-20230930-0482410080'];
+        //$array = ['419133-20231014-0293213008'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
@@ -137,11 +138,11 @@ class SearchOrderController extends Controller
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        dd($jsonstr);
+        //dd($jsonstr);
 
 
         $Orders = $jsonstr->OrderModelList;
-        dd($Orders[23]->PackageModelList[0]->ShippingModelList);
+        //dd($Orders[23]->PackageModelList[0]->ShippingModelList);
 
         //注文者情報
         foreach ($Orders as $order) {
@@ -419,10 +420,9 @@ class SearchOrderController extends Controller
     }
 
 
-    public function hoge()
+    public function kensaku()
     {
-        $hoge = Order::where('shippingDocumentNumber',NULL)->get();
-        dd($hoge);
+  
     }
     /**
      * Show the form for creating a new resource.

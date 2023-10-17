@@ -25,6 +25,12 @@ class Item extends Model
         'stock',
     ];
 
+
+    public function products()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
     //リレーション
     public function user()
     {

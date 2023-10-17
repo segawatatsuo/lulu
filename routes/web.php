@@ -6,6 +6,9 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\SearchOrderController;
 use App\Http\Controllers\ArrivalController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SearchController;
+use App\Models\Product;
 use Database\Seeders\SearchOrderSeeder;
 
 
@@ -57,6 +60,14 @@ Route::get('item',[ItemController::class,'index'])->name('item.index');
 Route::get('item.create',[ItemController::class,'create'])->name('item.create');
 Route::post('item.store',[ItemController::class,'store'])->name('item.store');
 
+
+Route::get('product',[ProductController::class,'index'])->name('product.index');
+Route::get('product.show/{id}',[ProductController::class,'show'])->name('product.show');
+Route::post('product.show/{id}',[ProductController::class,'show'])->name('product.show');
+Route::post('product.destroy/{id}/',[ProductController::class,'destroy'])->name('product.destroy'); 
+Route::post('product.update/{id}/',[ProductController::class,'update'])->name('product.update');  // 完了
+
+
 Route::post('item.show/{id}',[ItemController::class,'show'])->name('item.show');    // 表示
 Route::get('item.show/{id}',[ItemController::class,'show'])->name('item.show');    // バリデートの戻り表示用
 
@@ -76,3 +87,6 @@ Route::get('api_upload',[SearchOrderController::class,'api_upload']);
 
 #テスト
 Route::get('test', [SearchOrderController::class,'test']);
+
+#上部検索フォーム
+Route::get('search',[SearchController::class,'index']);

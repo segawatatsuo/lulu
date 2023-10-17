@@ -298,6 +298,10 @@ return [
             'type'         => 'navbar-search',
             'text'         => 'search',
             'topnav_right' => true,
+
+            'method' => 'GET',//検索送信メソッド
+            'url' => 'search',//検索先URL
+            'active' => true
         ],
      
         [
@@ -388,7 +392,7 @@ return [
         [
             'text'       => '商品',
             'icon_color' => 'cyan',
-            'url'        => 'item',
+            'url'        => 'product',
         ],
         [
             'text'       => '入荷',

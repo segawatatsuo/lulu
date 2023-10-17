@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
@@ -33,13 +34,9 @@ class ItemController extends Controller
      */
     public function index()
     {
-        /*
-        $items = Item::withSum('arrivals', 'arrival')->get();
-        $items = Item::where('user_id',auth()->id())->get();
-        */
+        $product = Product::where('id',Auth::id());
         //get()を->paginate(10)に変更
         $items = Item::withSum('arrivals', 'arrival')->where('user_id',auth()->id())->paginate(10);
-        
         return view('item/index', compact('items'));
     }
 
