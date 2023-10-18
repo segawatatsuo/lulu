@@ -16,24 +16,24 @@
 
             <thead>
                 <tr>
-                    <th style="width: 15%">登録日</th>
-                    <th style="width: 15%">SKU</th>
-                    <th style="width: 41%">商品名</th>
-                    <th style="width: 7%"></th>
-                    <th style="width: 7%"></th>
+                    <th style="width: 10%">注文日</th>
+                    <th style="width: 20%">注文番号</th>
+                    <th style="width: 15%">氏名</th>
+                    <th style="width: 55%">送付先</th>
                 </tr>
             </thead>
 
             <tbody>
-
+                    @foreach ( $results as $result )
+                        
+                    
                     <tr>
-
-
-                        <td>
-
-                        </td>
+                        <td>{{ $result->orderDate }}</td>
+                        <td><a href="{{ route('order.show',['id' => $result->id ]) }}">{{ $result->orderNumber }}</a></td>
+                        <td>{{ $result->Order_familyName }}{{ $result->Order_firstName }}</td>
+                        <td>{{ $result->Sender_prefecture }}{{ $result->Sender_city }}{{ $result->Sender_subAddress }}</td>
                     </tr>
-
+                    @endforeach
             </tbody>
         </table>
 

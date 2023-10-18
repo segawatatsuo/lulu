@@ -42,8 +42,8 @@ class SearchOrderController extends Controller
         $param = array(
             'orderProgressList' => [100, 200, 300, 400, 500, 600, 700, 800, 900],
             'dateType' => 1, //1: 注文日
-            'startDatetime' => '2023-10-01T00:00:00+0900',
-            'endDatetime' => '2023-10-17T23:59:59+0900',
+            'startDatetime' => '2023-10-10T00:00:00+0900',
+            'endDatetime' => '2023-10-18T23:59:59+0900',
             //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
             //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
 
@@ -121,11 +121,12 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        //$array = ['419133-20231014-0293213008'];
+        //$array = ['419133-20231012-0481012650','419133-20231015-0775713099','419133-20231015-0181213415','419133-20231016-0988313368'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
         );
+        //dd($param);
 
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
 
@@ -140,13 +141,12 @@ class SearchOrderController extends Controller
         $jsonstr = json_decode($xml, false);
         //dd($jsonstr);
 
-
         $Orders = $jsonstr->OrderModelList;
         //dd($Orders[23]->PackageModelList[0]->ShippingModelList);
 
         //注文者情報
         foreach ($Orders as $order) {
-            dd(count($order->PackageModelList[0]->ShippingModelList));
+            //dd(count($order->PackageModelList[0]->ShippingModelList));
             $add_order = new Order();
             $user_id = Auth::id();
             $add_order->fill([
@@ -277,7 +277,13 @@ class SearchOrderController extends Controller
                 foreach ($ItemModelList_array as $itemDetail) {
 
                     $add_detail = new OrderDetail();
+
+                    $user_id = Auth::id();
+
                     $add_detail->fill([
+                        
+                        'user_id' => $user_id,
+
                         'orderNumber' => $order->orderNumber,
                         'itemDetailId' => $itemDetail->itemDetailId,
                         'itemName' => $itemDetail->itemName,
