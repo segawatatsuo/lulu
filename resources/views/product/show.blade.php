@@ -92,8 +92,7 @@
 
             </fieldset>
         </form>
-        <button id="btn3">全行を取得</button>
-
+        
     @stop
 
 <!--
