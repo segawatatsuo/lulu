@@ -56,7 +56,7 @@ class ProductController extends Controller
         $product = Product::find( $id );
         //$items = Product::with('items')->get();
         $items = Item::with('products')->get();
-        return view('Product.show',compact('product','items'));
+        return view('product.show',compact('product','items'));
     }
 
     /**
