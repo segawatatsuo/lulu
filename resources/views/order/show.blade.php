@@ -64,10 +64,14 @@
                             <tr>
                                 <td style="width: 30%">配送方法</td>
                                 <td>{{ $orders->deliveryName }}</td>
+                                <td>伝票番号</td>
+                                <td>{{ $orders->shippingDocumentNumber }}</td>
                             </tr>
                             <tr>
                                 <td>お届け日時</td>
                                 <td>{{ $orders->deliveryDate }}{{ $orders->shippingTerm }}</td>
+                                <td>発送日</td>
+                                <td>{{ $orders->dateOfShipment }}</td>
                             </tr>
 
                         </tbody>
