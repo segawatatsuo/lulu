@@ -121,7 +121,7 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        $array = ['419133-20231018-0921614025'];
+        $array = ['419133-20231016-0937713491'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
