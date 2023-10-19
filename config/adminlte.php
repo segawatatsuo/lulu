@@ -296,7 +296,7 @@ return [
 
         [
             'type'         => 'navbar-search',
-            'text'         => 'search',
+            'text'         => '注文日(m-d)	注文番号	氏名	送付先',
             'topnav_right' => true,
 
             'method' => 'GET',//検索送信メソッド
