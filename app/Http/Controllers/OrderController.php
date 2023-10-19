@@ -81,7 +81,7 @@ class OrderController extends Controller
         $orders = Order::where([
             ['user_id', Auth::id()],
             ['dateOfShipment', '>', '2000/01/01'],
-            ['orderProgress', '300'],
+            //['orderProgress', '300'],
             ['shippingDocumentNumber', '<>', NULL],
             ['deliveryCompany', '<>', NULL],
             ['deliveryCompanyName', '<>', NULL],

@@ -89,10 +89,10 @@ class homeService
         $param = array(
             'orderProgressList' => [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ],
             'dateType' => 1, //1: 注文日
-            //'startDatetime' => '2023-09-29T00:00:00+0900',
-            //'endDatetime' => '2023-10-04T23:59:59+0900',
-            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
-            'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
+            'startDatetime' => '2023-10-14T00:00:00+0900',
+            'endDatetime' => '2023-10-18T23:59:59+0900',
+            //'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            //'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
             'PaginationRequestModel' => [
                 'requestRecordsAmount' => 1000,
                 'requestPage' => 1,

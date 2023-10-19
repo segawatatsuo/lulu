@@ -121,7 +121,7 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        //$array = ['419133-20231012-0481012650','419133-20231015-0775713099','419133-20231015-0181213415','419133-20231016-0988313368'];
+        $array = ['419133-20231018-0921614025'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
@@ -139,7 +139,7 @@ class SearchOrderController extends Controller
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        //dd($jsonstr);
+        dd($jsonstr);
 
         $Orders = $jsonstr->OrderModelList;
         //dd($Orders[23]->PackageModelList[0]->ShippingModelList);

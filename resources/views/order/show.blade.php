@@ -62,16 +62,16 @@
                     <table class="table table-sm">
                         <tbody>
                             <tr>
-                                <td style="width: 30%">配送方法</td>
-                                <td>{{ $orders->deliveryName }}</td>
-                                <td>伝票番号</td>
-                                <td>{{ $orders->shippingDocumentNumber }}</td>
+                                <td style="width: 15%">配送方法</td>
+                                <td style="width: 10%">{{ $orders->deliveryName }}</td>
+                                <td style="width: 15%">伝票番号</td>
+                                <td style="width: 10%">{{ $orders->shippingDocumentNumber }}</td>
                             </tr>
                             <tr>
-                                <td>お届け日時</td>
-                                <td>{{ $orders->deliveryDate }}{{ $orders->shippingTerm }}</td>
-                                <td>発送日</td>
-                                <td>{{ $orders->dateOfShipment }}</td>
+                                <td style="width: 15%">お届け日時</td>
+                                <td style="width: 10%">{{ $orders->deliveryDate }}{{ $orders->shippingTerm }}</td>
+                                <td style="width: 15%">発送日</td>
+                                <td style="width: 10%">{{ $orders->dateOfShipment }}</td>
                             </tr>
 
                         </tbody>
