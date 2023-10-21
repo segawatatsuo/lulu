@@ -29,9 +29,9 @@ class HomeController extends Controller
         //      データ取得
         /////////////////////////////
         //新しい楽天の注文データ取得
-        $this->home->rakuten_search_order();
+        //$this->home->rakuten_search_order();
         //楽天の既存データ更新
-        $this->home->rakuten_update();
+        //$this->home->rakuten_update();
 
         /////////////////////////////
         //      トップページ
