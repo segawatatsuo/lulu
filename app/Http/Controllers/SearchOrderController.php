@@ -103,6 +103,7 @@ class SearchOrderController extends Controller
     public function getorder()
     {
         $user = User::find(Auth::id());
+        dd($user);
         define("RMS_SERVICE_SECRET", $user->rms_service_secret);
         define("RMS_LICENSE_KEY", $user->rms_license_key);
         define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
