@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
+    
     // モデルに関連付けるテーブル
     protected $table = 'order_details';
     //整数値ではない主キーなのでインクリメントさせない

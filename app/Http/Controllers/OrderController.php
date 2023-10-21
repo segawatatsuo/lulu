@@ -7,8 +7,10 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\orderService;
 
 class OrderController extends Controller
 {
@@ -18,9 +20,12 @@ class OrderController extends Controller
      *
      * @return void
      */
+
+    private $odsv;
     public function __construct()
     {
         $this->middleware('auth');
+        $this->odsv = new orderService();
     }
     /**
      * Display a listing of the resource.
@@ -29,13 +34,38 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())->orderBy('orderDatetime', 'desc')->paginate(10);
+        //商品番号
+        /*
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+        //OrderDetailのitemNumberを管理している商品番号だけに絞り込む(narrow絞り込む)
+        $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
+        */
+
+        $narrow_datas = $this->odsv->get_target_items();
+        $orders = Order::whereIn('orderNumber', $narrow_datas)->orderBy('orderDate', 'desc')->paginate(10);
         return view('order/index', compact('orders'));
     }
 
     public function shipping()
     {
-        $orders = Order::where('user_id', Auth::id())->where('dateOfShipment', '>=', '2000/01/01')->orderBy('orderDate', 'desc')->paginate(10);
+        //商品番号
+        /*
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+        //OrderDetailのitemNumberがhx07だけに絞り込む(narrow絞り込む)
+        $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
+        */
+        $narrow_datas = $this->odsv->get_target_items();
+        $orders = Order::whereIn('orderNumber', $narrow_datas)->where('user_id', Auth::id())->where('dateOfShipment', '>=', '2000/01/01')->orderBy('orderDate', 'desc')->paginate(10);
         return view('shipping/index', compact('orders'));
     }
 
@@ -76,8 +106,28 @@ class OrderController extends Controller
 
     public function upload()
     {
-
-
+        //商品番号
+        /*
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+        $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
+        */
+        $narrow_datas = $this->odsv->get_target_items();
+        $orders = Order::whereIn('orderNumber', $narrow_datas)->where([
+            ['user_id', Auth::id()],
+            ['dateOfShipment', '>', '2000/01/01'],
+            ['orderProgress', '300'],
+            ['shippingDocumentNumber', '<>', NULL],
+            ['deliveryCompany', '<>', NULL],
+            ['deliveryCompanyName', '<>', NULL],
+            ['cmpletionReportUpLoadDate', '=', NULL],
+        ])->orderBy('orderDatetime', 'desc')->paginate(10);
+        
+        /*
         $orders = Order::where([
             ['user_id', Auth::id()],
             ['dateOfShipment', '>', '2000/01/01'],
@@ -87,6 +137,7 @@ class OrderController extends Controller
             ['deliveryCompanyName', '<>', NULL],
             ['cmpletionReportUpLoadDate', '=', NULL],
         ])->orderBy('orderDatetime', 'desc')->paginate(10);
+        */
 
         return view('upload.index', compact('orders'));
     }
@@ -146,11 +197,11 @@ array:5 [▼
             // ------------------------------------------------ パラメーター情報 連想配列
             $param = array(
                 'orderNumber' => $orderNumber, //注文番号
-                'BasketidModelList' => 
+                'BasketidModelList' =>
                 [
                     [
                         'basketId' => $basketId,
-                        'ShippingModelList' => 
+                        'ShippingModelList' =>
                         array([
                             //'shippingDetailId' => null,
                             'deliveryCompany' => $deliveryCompany,
@@ -198,7 +249,6 @@ array:5 [▼
                 $order = Order::where('orderNumber', $orderNumber)->first();
                 $order->cmpletionReportUpLoadDate = new Carbon();
                 $order->save();
-                
             } elseif ($httpcode == 401) {
                 array_push($results, $orderNumber . "...Un-Authorised (APIの使用許可がありません)");
             } elseif ($httpcode == 400) {

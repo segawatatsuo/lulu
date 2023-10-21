@@ -25,11 +25,17 @@ class HomeController extends Controller
 
     public function index()
     {
+        /////////////////////////////
+        //      データ取得
+        /////////////////////////////
         //新しい楽天の注文データ取得
         $this->home->rakuten_search_order();
-        //楽天のデータ更新
-        //$this->home->rakuten_update();
-        
+        //楽天の既存データ更新
+        $this->home->rakuten_update();
+
+        /////////////////////////////
+        //      トップページ
+        /////////////////////////////
         //新規受付数
         $count_new = $this->home->count_new();
         //出荷待ち数

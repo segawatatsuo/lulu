@@ -1,66 +1,85 @@
 <?php
-
 namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
 use App\Models\SearchOrderTemp;
 use App\Models\Order;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Carbon\Carbon;
-
 use Ramsey\Uuid\Type\Integer;
-
 use App\Http\Requests\StoreSearchOrderRequest;
 use App\Http\Requests\UpdateSearchOrderRequest;
 use App\Models\SearchOrder;
 
-
-
 class homeService
 {
+
+    private $odsv;
+
+    public function __construct()
+    {
+        $this->odsv = new orderService();
+    }
+    
     //新規受付数
     public function count_new()
-    {
-        return SearchOrderTemp::Where('user_id', Auth::id())->count();
+    {   
+        $now = Carbon::now();
+        $today = $now->format('Y-m-d');
+        $narrow_data = $this->odsv->get_target_items();
+        return Order::whereIn('orderNumber', $narrow_data)->where('orderDate',$today)->count();
     }
     //出荷待ち数
     public function count_orderProgress()
     {
-        return Order::whereNull('endFlag')->where(function ($query) {
+        $narrow_data = $this->odsv->get_target_items();
+        return Order::whereIn('orderNumber', $narrow_data)->whereNull('shippingDocumentNumber')->where(function ($query) {
             $query->where('orderProgress', 300)->Where('user_id', Auth::id());
         })->count();
     }
     //出荷済み数
     public function count_complete()
     {
-        return Order::whereNotNull('dateOfShipment')->where(function ($query) {
+        $narrow_data = $this->odsv->get_target_items();
+        return Order::whereIn('orderNumber', $narrow_data)->whereNotNull('dateOfShipment')->where(function ($query) {
             $query->whereNotNull('shippingDocumentNumber')->Where('user_id', Auth::id());
         })->count();
     }
     //登録商品数
     public function items_count()
     {
-        return Item::where('user_id', Auth::id())->count();
+        return Product::where('user_id', Auth::id())->count();
     }
     //受注金額requestPrice
     public function sum_requestPrice()
     {
-        return Order::where('user_id', Auth::id())->sum('requestPrice');
+        $narrow_data = $this->odsv->get_target_items();
+        return Order::whereIn('orderNumber', $narrow_data)->where('user_id', Auth::id())->sum('requestPrice');
     }
     //受注件数
     public function count_order()
     {
-        return Order::where('user_id', Auth::id())->count();
+        $narrow_data = $this->odsv->get_target_items();
+        return Order::whereIn('orderNumber', $narrow_data)->where('user_id', Auth::id())->count();
     }
     //売れ筋上位3件だけ
     public function top3()
     {
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+
+
         return DB::table('order_details')
+            ->whereIn('order_details.itemNumber', $item_no )
             ->where('user_id', Auth::id())
             ->select('itemName')
             ->selectRaw('SUM(priceTaxIncl) AS total_amount')
@@ -91,7 +110,8 @@ class homeService
             'dateType' => 1, //1: 注文日
             //'startDatetime' => '2023-10-14T00:00:00+0900',
             //'endDatetime' => '2023-10-20T23:59:59+0900',
-            'startDatetime' => date("Y-m-d") . "T00:00:00+0900", //期間検索開始日時
+            
+            'startDatetime' => date('Y-m-d', strtotime('-1 day')) . "T00:00:00+0900", //期間検索開始日時(昨日)
             'endDatetime' => date("Y-m-d") . "T23:59:59+0900", //期間検索終了日時
             'PaginationRequestModel' => [
                 'requestRecordsAmount' => 1000,
@@ -114,7 +134,6 @@ class homeService
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
 
-        //dd($jsonstr);
         $orderNumberList = $jsonstr->orderNumberList; //orderNumberListはオブジェクト型
         //Tempテーブルにインポート
         $user_id = Auth::id();
@@ -152,7 +171,7 @@ class homeService
             'orderNumberList' => $array,
             'version' => 7,
         );
-        //dd($array);
+
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
 
         $ch = curl_init($url);
@@ -165,7 +184,6 @@ class homeService
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
         $Orders = $jsonstr->OrderModelList;
-        //dd($jsonstr);
 
         //注文者情報
         foreach ($Orders as $order) {
@@ -355,7 +373,6 @@ class homeService
                         'SkuModelList_skuInfo' => $SkuModelList_skuInfo,
                         'SkuModelList_variantId' => $SkuModelList_variantId,
                         'SkuModelList_merchantDefinedSkuId' => $SkuModelList_merchantDefinedSkuId,
-
                     ]);
                     $add_detail->save();
                 }
@@ -367,20 +384,28 @@ class homeService
     public function rakuten_update()
     {
         $user = User::find(Auth::id());
+
+        //定数 RMS_SERVICE_SECRET はすでに定義されています
         //define("RMS_SERVICE_SECRET", $user->rms_service_secret);
         //define("RMS_LICENSE_KEY", $user->rms_license_key);
         //define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
-
         $authkey = AUTH_KEY;
         $header = array(
             "Content-Type: application/json; charset=utf-8",
             "Authorization: ESA {$authkey}",
         );
-        // データベースから、現在300以外を取り出す
-        //$order_numbers = Order::where('orderProgress', '!=', 300)->get();
-        // データベースから、配送伝票番号がNULLのままの人を探す
-        $order_numbers = Order::where('shippingDocumentNumber',NULL)->get();
-        //dd($order_numbers);
+
+        //商品番号
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+
+        $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
+        $order_numbers = Order::whereIn('orderNumber', $narrow_datas)->where('shippingDocumentNumber',NULL)->get();
+
         $array = [];
         foreach ($order_numbers as $num) {
             array_push($array, $num->orderNumber);
@@ -389,7 +414,6 @@ class homeService
             'orderNumberList' => $array,
             'version' => 7,
         );
-        //dd($param);
 
         $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
         $ch = curl_init($url);
@@ -402,40 +426,27 @@ class homeService
         curl_close($ch);
 
         $jsonstr = json_decode($xml, false);
-        //dd($jsonstr);
         $Orders = $jsonstr->OrderModelList;
-        //dd($jsonstr);
 
         foreach ($Orders as $order) {
             $orderNumber = $order->orderNumber;
             $orderProgress = $order->orderProgress;
-
-            //$shippingDetailId = $order->shippingDetailId;
-            //$shippingNumber = $order->shippingDocumentNumber;
-            //$deliveryCompany = $order->deliveryCompany;
-            //$deliveryCompanyName = $order->deliveryCompanyName;
-            //$shippingDate = $order->dateOfShipment;
-
-            $Sender_zipCode1 = $order->Sender_zipCode1;
-            $Sender_zipCode2 = $order->Sender_zipCode2;
-            $Sender_prefecture = $order->Sender_prefecture;
-            $Sender_city = $order->Sender_city;
-            $Sender_subAddress = $order->Sender_subAddress;
-            $Sender_familyName = $order->Sender_familyName;
-            $Sender_firstName = $order->Sender_firstName;
-            $Sender_familyNameKana = $order->Sender_familyNameKana;
-            $Sender_firstNameKana = $order->Sender_firstNameKana;
-            $Sender_phoneNumber1 = $order->Sender_phoneNumber1;
-            $Sender_phoneNumber2 = $order->Sender_phoneNumber2;
-            $Sender_phoneNumber3 = $order->Sender_phoneNumber3;
+            $Sender_zipCode1 = $order->PackageModelList[0]->SenderModel->zipCode1;
+            $Sender_zipCode2 = $order->PackageModelList[0]->SenderModel->zipCode2;
+            $Sender_prefecture = $order->PackageModelList[0]->SenderModel->prefecture;
+            $Sender_city = $order->PackageModelList[0]->SenderModel->city;
+            $Sender_subAddress = $order->PackageModelList[0]->SenderModel->subAddress;
+            $Sender_familyName = $order->PackageModelList[0]->SenderModel->familyName;
+            $Sender_firstName = $order->PackageModelList[0]->SenderModel->firstName;
+            $Sender_familyNameKana = $order->PackageModelList[0]->SenderModel->familyNameKana;
+            $Sender_firstNameKana = $order->PackageModelList[0]->SenderModel->firstNameKana;
+            $Sender_phoneNumber1 = $order->PackageModelList[0]->SenderModel->phoneNumber1;
+            $Sender_phoneNumber2 = $order->PackageModelList[0]->SenderModel->phoneNumber2;
+            $Sender_phoneNumber3 = $order->PackageModelList[0]->SenderModel->phoneNumber3;
+            $isolatedIslandFlag = $order->PackageModelList[0]->SenderModel->isolatedIslandFlag;
 
             Order::where('orderNumber',$orderNumber)->update([
                 'orderProgress' => $orderProgress,
-                //'shippingDetailId' => $shippingDetailId,
-                //'deliveryCompany' => $deliveryCompany,
-                //'deliveryCompanyName' => $deliveryCompanyName,
-                //'shippingDate' => $shippingDate,
-
                 'Sender_zipCode1' => $Sender_zipCode1,
                 'Sender_zipCode2' => $Sender_zipCode2,
                 'Sender_prefecture' => $Sender_prefecture,
@@ -448,7 +459,9 @@ class homeService
                 'Sender_phoneNumber1' => $Sender_phoneNumber1,
                 'Sender_phoneNumber2' => $Sender_phoneNumber2,
                 'Sender_phoneNumber3' => $Sender_phoneNumber3,
+                'isolatedIslandFlag' => $isolatedIslandFlag,
             ]);
         }
     }
+
 }

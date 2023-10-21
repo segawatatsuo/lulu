@@ -1,20 +1,33 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\SearchOrderTemp;
 use App\Models\Order;
+use App\Models\Item;
+use App\Models\User;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use Carbon\Carbon;
 
-class SearchController extends Controller
+use Ramsey\Uuid\Type\Integer;
+
+use App\Http\Requests\StoreSearchOrderRequest;
+use App\Http\Requests\UpdateSearchOrderRequest;
+use App\Models\SearchOrder;
+
+
+
+class orderService
 {
-    public function index(Request $request){
-        $param = $request->adminlteSearch;
-
-        //商品番号
+    //新規受付数
+    public function get_target_items()
+    {
+        //対象となる商品番号だけ取り出す
         $products = Product::select('product_code')->where('user_id', Auth::id())->get();
         $item_no = [];
         foreach ($products as $product) {
@@ -23,10 +36,7 @@ class SearchController extends Controller
         }
         //OrderDetailのitemNumberを管理している商品番号だけに絞り込む(narrow絞り込む)
         $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
-        $results =Order::whereIn('orderNumber', $narrow_datas)->where(DB::raw('CONCAT(Order_familyName, Order_firstName)'), 'like', '%'.$param.'%')->orwhere('orderNumber','like', '%'.$param.'%')->orwhere('orderDate','like', '%'.$param.'%')->orwhere('Sender_prefecture','like', '%'.$param.'%')->orwhere('Sender_city','like', '%'.$param.'%')->orderBy('orderDate','asc')->get();
-        return view('search.index',compact('results'));
+        
+        return($narrow_datas);
     }
 }
-
-
-

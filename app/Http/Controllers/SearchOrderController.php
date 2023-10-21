@@ -8,6 +8,7 @@ use App\Models\SearchOrder;
 use App\Models\SearchOrderTemp;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -121,7 +122,7 @@ class SearchOrderController extends Controller
         foreach ($order_numbers as $num) {
             array_push($array, $num->order_number);
         }
-        $array = ['419133-20231016-0937713491'];
+        $array = ['419133-20231018-0921614025'];
         $param = array(
             'orderNumberList' => $array,
             'version' => 7,
@@ -422,6 +423,114 @@ class SearchOrderController extends Controller
             echo "Internal Server Error (サーバ内部にエラーが発生)<br>";
         }elseif($httpcode==503){
             echo "Service Unavailable (サービスが一時的に過負荷やメンテナンスで使用不可能)<br>";
+        }
+    }
+
+    public function rakuten_update()
+    {
+        $user = User::find(Auth::id());
+        define("RMS_SERVICE_SECRET", $user->rms_service_secret);
+        define("RMS_LICENSE_KEY", $user->rms_license_key);
+        define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
+
+        $authkey = AUTH_KEY;
+        $header = array(
+            "Content-Type: application/json; charset=utf-8",
+            "Authorization: ESA {$authkey}",
+        );
+
+
+        //商品番号
+        $products = Product::select('product_code')->where('user_id', Auth::id())->get();
+        $item_no = [];
+        foreach ($products as $product) {
+            $no = $product->product_code;
+            array_push($item_no, $no);
+        }
+        //OrderDetailのitemNumberを管理している商品番号だけに絞り込む(narrow絞り込む)
+        $narrow_datas = OrderDetail::select('orderNumber')->where('user_id', Auth::id())->whereIn('order_details.itemNumber', $item_no )->get();
+        // データベースから、配送伝票番号がNULLのままの人を探す
+        $order_numbers = Order::whereIn('orderNumber', $narrow_datas)->where('shippingDocumentNumber',NULL)->get();
+        //dd($order_numbers);
+
+
+        //dd($order_numbers);
+        $array = [];
+        foreach ($order_numbers as $num) {
+            array_push($array, $num->orderNumber);
+        }
+        $param = array(
+            'orderNumberList' => $array,
+            'version' => 7,
+        );
+        //dd($param);
+
+        $url = "https://api.rms.rakuten.co.jp/es/2.0/order/getOrder/";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true); //POST送信
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param)); //jsonにエンコード
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $xml = curl_exec($ch);
+        curl_close($ch);
+
+        $jsonstr = json_decode($xml, false);
+        //dd($jsonstr);
+        $Orders = $jsonstr->OrderModelList;
+
+        //'Sender_zipCode1' => $order->PackageModelList[0]->SenderModel->zipCode1,
+ 
+
+        foreach ($Orders as $order) {
+
+            $orderNumber = $order->orderNumber;
+            $orderProgress = $order->orderProgress;
+
+            //$shippingDetailId = $order->shippingDetailId;
+            
+            //$shippingNumber = $order->shippingDocumentNumber;
+            //$deliveryCompany = $order->deliveryCompany;
+            //$deliveryCompanyName = $order->deliveryCompanyName;
+            //$shippingDate = $order->dateOfShipment;
+
+            $Sender_zipCode1 = $order->PackageModelList[0]->SenderModel->zipCode1;
+            $Sender_zipCode2 = $order->PackageModelList[0]->SenderModel->zipCode2;
+
+            
+            $Sender_prefecture = $order->PackageModelList[0]->SenderModel->prefecture;
+            $Sender_city = $order->PackageModelList[0]->SenderModel->city;
+            $Sender_subAddress = $order->PackageModelList[0]->SenderModel->subAddress;
+            $Sender_familyName = $order->PackageModelList[0]->SenderModel->familyName;
+            $Sender_firstName = $order->PackageModelList[0]->SenderModel->firstName;
+            $Sender_familyNameKana = $order->PackageModelList[0]->SenderModel->familyNameKana;
+            $Sender_firstNameKana = $order->PackageModelList[0]->SenderModel->firstNameKana;
+            $Sender_phoneNumber1 = $order->PackageModelList[0]->SenderModel->phoneNumber1;
+            $Sender_phoneNumber2 = $order->PackageModelList[0]->SenderModel->phoneNumber2;
+            $Sender_phoneNumber3 = $order->PackageModelList[0]->SenderModel->phoneNumber3;
+            $isolatedIslandFlag = $order->PackageModelList[0]->SenderModel->isolatedIslandFlag;
+
+            Order::where('orderNumber',$orderNumber)->update([
+                'orderProgress' => $orderProgress,
+                //'shippingDetailId' => $shippingDetailId,
+                //'deliveryCompany' => $deliveryCompany,
+                //'deliveryCompanyName' => $deliveryCompanyName,
+                //'shippingDate' => $shippingDate,
+
+                'Sender_zipCode1' => $Sender_zipCode1,
+                'Sender_zipCode2' => $Sender_zipCode2,
+                'Sender_prefecture' => $Sender_prefecture,
+                'Sender_city' => $Sender_city,
+                'Sender_subAddress' => $Sender_subAddress,
+                'Sender_familyName' => $Sender_familyName,
+                'Sender_firstName' => $Sender_firstName,
+                'Sender_familyNameKana' => $Sender_firstName,
+                'Sender_firstNameKana' => $Sender_firstNameKana,
+                'Sender_phoneNumber1' => $Sender_phoneNumber1,
+                'Sender_phoneNumber2' => $Sender_phoneNumber2,
+                'Sender_phoneNumber3' => $Sender_phoneNumber3,
+                'isolatedIslandFlag' => $isolatedIslandFlag,
+            ]);
         }
     }
 

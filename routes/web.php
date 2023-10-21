@@ -77,6 +77,7 @@ Route::post('item.destroy/{id}/',[ItemController::class,'destroy'])->name('item.
 #SearchOrder
 Route::get('search-order',[SearchOrderController::class,'index'])->name('search-order.index');
 Route::get('getorder',[SearchOrderController::class,'getorder']);
+Route::get('rakuten_update',[SearchOrderController::class,'rakuten_update']);
 
 #楽天にアップロード
 Route::get('upload',[OrderController::class,'upload'])->name('upload.index');
