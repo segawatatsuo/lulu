@@ -386,9 +386,9 @@ class homeService
         $user = User::find(Auth::id());
 
         //定数 RMS_SERVICE_SECRET はすでに定義されています
-        //define("RMS_SERVICE_SECRET", $user->rms_service_secret);
-        //define("RMS_LICENSE_KEY", $user->rms_license_key);
-        //define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
+        define("RMS_SERVICE_SECRET", $user->rms_service_secret);
+        define("RMS_LICENSE_KEY", $user->rms_license_key);
+        define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
         $authkey = AUTH_KEY;
         $header = array(
             "Content-Type: application/json; charset=utf-8",
