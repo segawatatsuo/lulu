@@ -323,6 +323,9 @@ class homeService
                 'deliveryCompany' => $deliveryCompany,
                 'deliveryCompanyName' => $deliveryCompanyName,
                 'dateOfShipment' => $shippingDate,
+                'sender_tel' => $order->PackageModelList[0]->SenderModel->phoneNumber1.$order->PackageModelList[0]->SenderModel->phoneNumber2.$order->PackageModelList[0]->SenderModel->phoneNumber3,
+                'order_tel' => $order->OrdererModel->phoneNumber1.$order->OrdererModel->phoneNumber2.$order->OrdererModel->phoneNumber3
+
             ]);
             $add_order->save();
         }
@@ -460,6 +463,7 @@ class homeService
                 'Sender_phoneNumber2' => $Sender_phoneNumber2,
                 'Sender_phoneNumber3' => $Sender_phoneNumber3,
                 'isolatedIslandFlag' => $isolatedIslandFlag,
+                'sender_tel' => $Sender_phoneNumber1.$Sender_phoneNumber2.$Sender_phoneNumber3,
             ]);
         }
     }

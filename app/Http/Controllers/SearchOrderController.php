@@ -103,7 +103,7 @@ class SearchOrderController extends Controller
     public function getorder()
     {
         $user = User::find(Auth::id());
-        dd($user);
+        
         define("RMS_SERVICE_SECRET", $user->rms_service_secret);
         define("RMS_LICENSE_KEY", $user->rms_license_key);
         define("AUTH_KEY", base64_encode(RMS_SERVICE_SECRET . ':' . RMS_LICENSE_KEY));
@@ -141,7 +141,7 @@ class SearchOrderController extends Controller
         $xml = curl_exec($ch);
         curl_close($ch);
         $jsonstr = json_decode($xml, false);
-        dd($jsonstr);
+        //dd($jsonstr);
 
         $Orders = $jsonstr->OrderModelList;
         //dd($Orders[23]->PackageModelList[0]->ShippingModelList);
@@ -264,8 +264,10 @@ class SearchOrderController extends Controller
                 'paymentCharge' => $order->TaxSummaryModelList[0]->paymentCharge,
                 'couponPrice' => $order->TaxSummaryModelList[0]->couponPrice,
                 'point' => $order->TaxSummaryModelList[0]->point,
-                'shoppingMallName' => '楽天'
+                'shoppingMallName' => '楽天',
 
+                'sender_tel' => $order->PackageModelList[0]->SenderModel->phoneNumber1.$order->PackageModelList[0]->SenderModel->phoneNumber2.$order->PackageModelList[0]->SenderModel->phoneNumber3,
+                'order_tel' => $order->OrdererModel->phoneNumber1.$order->OrdererModel->phoneNumber2.$order->OrdererModel->phoneNumber3
 
             ]);
             $add_order->save();
