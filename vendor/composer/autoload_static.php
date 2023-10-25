@@ -630,6 +630,7 @@ class ComposerStaticInit5b9a2e1da9a4d2cf8ac0f854027f52ed
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\RakutenApi' => __DIR__ . '/../..' . '/app/Console/Commands/RakutenApi.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\ArrivalController' => __DIR__ . '/../..' . '/app/Http/Controllers/ArrivalController.php',
@@ -645,6 +646,7 @@ class ComposerStaticInit5b9a2e1da9a4d2cf8ac0f854027f52ed
         'App\\Http\\Controllers\\ItemDetailController' => __DIR__ . '/../..' . '/app/Http/Controllers/ItemDetailController.php',
         'App\\Http\\Controllers\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/OrderController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
+        'App\\Http\\Controllers\\SearchController' => __DIR__ . '/../..' . '/app/Http/Controllers/SearchController.php',
         'App\\Http\\Controllers\\SearchOrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/SearchOrderController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
@@ -700,6 +702,7 @@ class ComposerStaticInit5b9a2e1da9a4d2cf8ac0f854027f52ed
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'App\\Services\\homeService' => __DIR__ . '/../..' . '/app/Services/homeService.php',
+        'App\\Services\\orderService' => __DIR__ . '/../..' . '/app/Services/orderService.php',
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Cors.php',
         'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/CorsService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
